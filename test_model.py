@@ -1,3 +1,6 @@
+from PIL import Image
+import os
+import random
 from transformers import Trainer
 from transformers import TrainingArguments
 from datasets import load_metric
@@ -11,21 +14,47 @@ import requests
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 labels = ["crossdressing", "non-crossdressing"]
 
-def predict(image):
-    feature_extractor = ViTImageProcessor.from_pretrained(".\\vit-base-dress-detection\\")
-    model = ViTForImageClassification.from_pretrained(".\\vit-base-dress-detection\\")
 
-    inputs = feature_extractor(images=image, return_tensors="pt")
+def predict(image):
+    feature_extractor = ViTImageProcessor.from_pretrained(
+        ".\\vit-base-dress-detection\\")
+    model = ViTForImageClassification.from_pretrained(
+        ".\\vit-base-dress-detection\\")
+
+    inputs = feature_extractor(images=image.convert("RGB"), return_tensors="pt")
     outputs = model(**inputs)
     logits = outputs.logits
     # model predicts one of the 1000 ImageNet classes
     predicted_class_idx = logits.argmax(-1).item()
-    print("Predicted class:", model.config.id2label[predicted_class_idx])
+    return model.config.id2label[predicted_class_idx]
 
-import os
-from PIL import Image
 
-for filename in os.listdir('./tests'):
-    path = os.path.join('./tests', filename)
-    print(filename + ":")
-    predict(Image.open(path))
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+
+xplot = 3
+w, h = (224, 224)
+labels = ["crossdressing", "non-crossdressing"]
+
+tests=os.listdir('./tests')
+grid = Image.new('RGB', size=(
+    xplot * w, len(tests) // xplot * h))
+draw = ImageDraw.Draw(grid)
+font = ImageFont.truetype(
+    "J:\\Oculus\\Support\\oculus-dash\\dash\\data\\fonts\\NotoSansCJKtc-Bold.ttf", 24)
+
+
+for i, filename in enumerate(tests):
+    try:
+        path = os.path.join('./tests', filename)
+        image = Image.open(path)
+        idx = i
+        box = (idx % xplot * w, idx // xplot * h)
+        grid.paste(image.resize((w, h)), box=box)
+        draw.text(box, predict(image.convert("RGB")), (255, 255, 255),
+                font=font, stroke_width=2, stroke_fill="black")
+        print("{}/{}    \r",i,len(tests))
+    except:
+        print("Failed {filename}")
+
+grid.save("./model_test.png")

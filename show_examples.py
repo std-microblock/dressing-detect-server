@@ -2,7 +2,7 @@ import random
 from PIL import ImageDraw, ImageFont, Image, ImageFile
 from datasets import load_dataset
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-dataset = load_dataset("imagefolder", data_dir="./dataset")
+dataset = load_dataset("imagefolder", data_dir="./dataset_validation")
 
 def show_examples(ds, seed: int = 1234, examples_per_class: int = 3, size=(350, 350)):
     w, h = size
@@ -14,7 +14,6 @@ def show_examples(ds, seed: int = 1234, examples_per_class: int = 3, size=(350, 
     for label_id, label in enumerate(labels):
         ds_slice = ds['train'].filter(lambda ex: ex['label'] == label_id).shuffle(seed).select(range(examples_per_class))
 
-        # Plot this label's examples along a row
         for i, example in enumerate(ds_slice):
             image = example['image']
             idx = examples_per_class * label_id + i

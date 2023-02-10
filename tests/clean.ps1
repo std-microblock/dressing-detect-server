@@ -1,8 +1,8 @@
-$files = Get-ChildItem "./" -Filter *.* -file -Recurse | 
+$files = Get-ChildItem "./" -Filter *.png -file -Recurse | 
 foreach-object {
 
     $Source = $_.FullName
-    $test = [System.IO.Path]::GetDirectoryName($source) + "\..\non-crossdressing\"
+    $test = [System.IO.Path]::GetDirectoryName($source)
     $base= $_.BaseName+".jpg"
     $basedir = $test+"\"+$base
     Write-Host $basedir

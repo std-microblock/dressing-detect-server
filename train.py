@@ -36,7 +36,7 @@ def collate_fn(batch):
 
 
 def transform(batch):
-    batchTs = [x for x in batch['image']]
+    batchTs = [x.convert("RGB") for x in batch['image']]
     inputs = feature_extractor(
         images=batchTs, return_tensors='pt', padding=True)
 
